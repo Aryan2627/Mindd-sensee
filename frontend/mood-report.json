@@ -1,0 +1,90 @@
+[
+  {
+    "time": "11:01:21 pm",
+    "value": 3
+  },
+  {
+    "time": "11:01:39 pm",
+    "value": 2
+  },
+  {
+    "time": "11:05:01 pm",
+    "value": 3
+  },
+  {
+    "time": "11:24:07 pm",
+    "value": "neutral"
+  },
+  {
+    "time": "11:43:57 pm",
+    "value": "anxious"
+  },
+  {
+    "time": "11:49:58 pm",
+    "value": "anxious"
+  },
+  {
+    "time": "11:50:15 pm",
+    "value": "neutral"
+  },
+  {
+    "time": "11:50:52 pm",
+    "value": "neutral"
+  },
+  {
+    "time": "12:00:30 am",
+    "value": "neutral"
+  },
+  {
+    "time": "12:00:46 am",
+    "value": "sad"
+  },
+  {
+    "time": "12:01:08 am",
+    "value": "happy"
+  },
+  {
+    "time": "12:02:02 am",
+    "value": "sad"
+  },
+  {
+    "time": "12:03:01 am",
+    "value": "neutral"
+  },
+  {
+    "time": "12:03:21 am",
+    "value": "neutral"
+  },
+  {
+    "time": "12:03:57 am",
+    "value": "neutral"
+  },
+  {
+    "time": "12:09:58 am",
+    "value": "anxious"
+  },
+  {
+    "time": "12:10:18 am",
+    "value": "happy"
+  },
+  {
+    "time": "12:10:55 am",
+    "value": "anxious"
+  },
+  {
+    "time": "12:11:29 am",
+    "value": "neutral"
+  },
+  {
+    "time": "12:11:53 am",
+    "value": "happy"
+  },
+  {
+    "time": "12:13:47 am",
+    "value": "neutral"
+  },
+  {
+    "time": "12:14:02 am",
+    "value": "anxious"
+  }
+]
