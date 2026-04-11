@@ -3,7 +3,7 @@ import { Chart, registerables } from "chart.js";
 import { motion } from "framer-motion";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import React from "react";
 Chart.register(...registerables);
 
 /* 🎨 COLORS */

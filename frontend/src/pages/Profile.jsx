@@ -2,6 +2,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import React from "react";
 
 function Toggle({ defaultChecked }) {
   const [on, setOn] = useState(defaultChecked || false)

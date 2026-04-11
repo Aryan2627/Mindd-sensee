@@ -1,5 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
+import React from "react";
 
 function Model({ speaking }) {
   const { scene } = useGLTF(

@@ -1,3 +1,5 @@
+import React from "react"; // ✅ ADD THIS LINE
+
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
@@ -20,7 +22,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
-
+      
       {/* NAVBAR */}
       <Navbar />
 
@@ -28,9 +30,7 @@ export default function App() {
       <div className="flex-grow">
         <Routes>
 
-          {/* 🔥 MAIN LANDING BACK */}
           <Route path="/" element={<Landing />} />
-
           <Route path="/auth" element={<Auth />} />
 
           <Route

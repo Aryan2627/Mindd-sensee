@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useRef as useThreeRef } from "react";
+import React from "react";
 
 /* ================= AI ORB ================= */
 

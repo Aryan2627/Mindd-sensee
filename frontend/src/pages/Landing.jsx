@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import React from "react";
 
 const features = [
   { icon: "🧠", title: "Emotion detection", desc: "AI reads emotion behind your words with high accuracy." },
