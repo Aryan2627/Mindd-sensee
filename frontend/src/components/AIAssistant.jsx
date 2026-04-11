@@ -1,6 +1,7 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Sphere } from "@react-three/drei";
 import { useRef } from "react";
+import React from "react";
 
 function AnimatedOrb({ isSpeaking, emotion }) {
   const meshRef = useRef();
