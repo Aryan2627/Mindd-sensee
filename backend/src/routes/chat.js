@@ -1,11 +1,16 @@
 const express = require('express')
 const axios   = require('axios')
-const OpenAI  = require('openai')
 const Chat    = require('../models/Chat')
 const protect = require('../middleware/auth')
 
 const router = express.Router()
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+// ✅ Safe OpenAI setup (won’t crash if key missing)
+let openai = null
+if (process.env.OPENAI_API_KEY) {
+  const OpenAI = require('openai')
+  openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+}
 
 const ML_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000'
 
@@ -25,7 +30,7 @@ Crisis resources (India):
 - Vandrevala Foundation: 1860-2662-345
 - AASRA: 9820466627`
 
-// GET /api/chat/conversations
+// GET conversations
 router.get('/conversations', protect, async (req, res) => {
   try {
     const chats = await Chat.find({ userId: req.user._id })
@@ -38,7 +43,7 @@ router.get('/conversations', protect, async (req, res) => {
   }
 })
 
-// GET /api/chat/:chatId/messages
+// GET messages
 router.get('/:chatId/messages', protect, async (req, res) => {
   try {
     const chat = await Chat.findOne({ _id: req.params.chatId, userId: req.user._id })
@@ -49,74 +54,89 @@ router.get('/:chatId/messages', protect, async (req, res) => {
   }
 })
 
-// POST /api/chat/send
+// SEND message
 router.post('/send', protect, async (req, res) => {
   try {
     const { message, chatId, emotion = 'neutral', confidence = 0.5 } = req.body
     if (!message) return res.status(400).json({ message: 'Message is required' })
 
-    // 1. Run risk detection via ML service
+    // 1. ML risk detection
     let riskLevel = 'low'
     let mlEmotion = emotion
+
     try {
       const mlRes = await axios.post(`${ML_URL}/risk-detection`, { text: message }, { timeout: 5000 })
-      riskLevel  = mlRes.data.risk
-      mlEmotion  = mlRes.data.emotion || emotion
-    } catch { /* ML service unavailable — continue */ }
-
-    // 2. Find or create chat session
-    let chat
-    if (chatId) {
-      chat = await Chat.findOne({ _id: chatId, userId: req.user._id })
+      riskLevel = mlRes.data.risk
+      mlEmotion = mlRes.data.emotion || emotion
+    } catch {
+      console.log("ML service unavailable")
     }
+
+    // 2. Get or create chat
+    let chat = chatId
+      ? await Chat.findOne({ _id: chatId, userId: req.user._id })
+      : null
+
     if (!chat) {
-      chat = await Chat.create({ userId: req.user._id, title: message.slice(0, 50) })
+      chat = await Chat.create({
+        userId: req.user._id,
+        title: message.slice(0, 50)
+      })
     }
 
-    // 3. Build OpenAI context from last 10 messages
+    // 3. Build history
     const history = chat.messages.slice(-10).map(m => ({
       role: m.role === 'ai' ? 'assistant' : 'user',
       content: m.text,
     }))
 
-    const userContext = `[Detected emotion: ${mlEmotion}, confidence: ${Math.round(confidence * 100)}%, risk: ${riskLevel}]\n${message}`
+    const userContext = `[Emotion: ${mlEmotion}, Risk: ${riskLevel}]\n${message}`
 
-    // 4. Call OpenAI
+    // 4. Generate reply (SAFE fallback)
     let reply
-    try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT },
-          ...history,
-          { role: 'user', content: userContext },
-        ],
-        max_tokens: 200,
-        temperature: 0.75,
-      })
-      reply = completion.choices[0].message.content
-    } catch {
-      reply = "I'm here with you. It sounds like you're going through something difficult. Would you like to tell me more about how you're feeling?"
+
+    if (openai) {
+      try {
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [
+            { role: 'system', content: SYSTEM_PROMPT },
+            ...history,
+            { role: 'user', content: userContext },
+          ],
+          max_tokens: 200,
+          temperature: 0.75,
+        })
+
+        reply = completion.choices[0].message.content
+      } catch {
+        reply = "I'm here for you. Tell me more about how you're feeling 💙"
+      }
+    } else {
+      // ✅ No OpenAI → fallback message
+      reply = `I understand you're feeling ${mlEmotion}. I'm here to listen. Tell me more 💙`
     }
 
-    // Append crisis resources if high risk
+    // Add crisis message
     if (riskLevel === 'high') {
-      reply += "\n\nIf you're in crisis, please reach out immediately: iCall 9152987821 or Vandrevala Foundation 1860-2662-345."
+      reply += "\n\nIf you're in crisis, please reach out: iCall 9152987821 or Vandrevala Foundation 1860-2662-345."
     }
 
     // 5. Save messages
     chat.messages.push({ role: 'user', text: message, emotion: mlEmotion, confidence, risk: riskLevel })
-    chat.messages.push({ role: 'ai',   text: reply,   emotion: mlEmotion, risk: riskLevel })
+    chat.messages.push({ role: 'ai', text: reply, emotion: mlEmotion, risk: riskLevel })
     chat.lastEmotion = mlEmotion
+
     await chat.save()
 
     res.json({ reply, chatId: chat._id, emotion: mlEmotion, risk: riskLevel })
+
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
 })
 
-// DELETE /api/chat/:chatId
+// DELETE chat
 router.delete('/:chatId', protect, async (req, res) => {
   await Chat.findOneAndDelete({ _id: req.params.chatId, userId: req.user._id })
   res.json({ message: 'Chat deleted' })
