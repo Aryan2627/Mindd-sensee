@@ -1,4 +1,4 @@
-import React from "react"; // ✅ ADD THIS LINE
+import React from "react";
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
@@ -30,18 +30,14 @@ export default function App() {
       <div className="flex-grow">
         <Routes>
 
+          {/* PUBLIC ROUTES */}
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
 
-          <Route
-            path="/chat"
-            element={
-              <PrivateRoute>
-                <Chat />
-              </PrivateRoute>
-            }
-          />
+          {/* ✅ CHAT NOW PUBLIC (NO LOGIN REQUIRED) */}
+          <Route path="/chat" element={<Chat />} />
 
+          {/* 🔒 PROTECTED ROUTES */}
           <Route
             path="/mood"
             element={
@@ -60,6 +56,7 @@ export default function App() {
             }
           />
 
+          {/* FALLBACK */}
           <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
