@@ -1,12 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef as useThreeRef } from "react";
-import React from "react";
 
 /* ================= AI ORB ================= */
 
 function AnimatedOrb({ speaking, emotion }) {
-  const meshRef = useThreeRef();
+  const meshRef = useRef();
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
@@ -52,7 +50,7 @@ function AIAssistant({ speaking, emotion }) {
   );
 }
 
-/* ================= CATEGORY MAP ================= */
+/* ================= CATEGORY ================= */
 
 const categoryMap = {
   happy: "Positive",
@@ -148,6 +146,7 @@ export default function Chat() {
 
     const userMsg = { role: "user", text: input };
 
+    /* ADD USER MESSAGE */
     setChats((prev) =>
       prev.map((chat) =>
         chat.id === activeChatId
@@ -159,21 +158,23 @@ export default function Chat() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: input }),
-      });
+      const res = await fetch(
+        import.meta.env.VITE_API_URL + "/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ text: input }),
+        }
+      );
 
       const data = await res.json();
 
       const detectedEmotion = data.emotion;
-
       const aiMsg = { role: "ai", text: data.reply };
 
-      /* 🧠 STORE MOOD HISTORY */
+      /* SAVE MOOD */
       const newEntry = {
         value: detectedEmotion,
         category: categoryMap[detectedEmotion],
@@ -184,13 +185,14 @@ export default function Chat() {
       const prev =
         JSON.parse(localStorage.getItem("moodHistory")) || [];
 
-      const updated = [...prev, newEntry];
+      localStorage.setItem(
+        "moodHistory",
+        JSON.stringify([...prev, newEntry])
+      );
 
-      localStorage.setItem("moodHistory", JSON.stringify(updated));
-
-      /* 🚀 REAL-TIME UPDATE */
       window.dispatchEvent(new Event("moodUpdated"));
 
+      /* ADD AI MESSAGE */
       setChats((prev) =>
         prev.map((chat) =>
           chat.id === activeChatId
@@ -200,7 +202,7 @@ export default function Chat() {
                   chat.messages.length === 0
                     ? input.slice(0, 20)
                     : chat.title,
-                messages: [...chat.messages, userMsg, aiMsg],
+                messages: [...chat.messages, aiMsg],
               }
             : chat
         )
