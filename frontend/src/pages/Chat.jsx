@@ -140,7 +140,7 @@ export default function Chat() {
 
   const activeChat = chats.find((c) => c.id === activeChatId);
 
-  /* 🚀 SEND MESSAGE */
+  /* 🚀 SEND MESSAGE (FIXED ✅) */
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -159,20 +159,23 @@ export default function Chat() {
 
     try {
       const res = await fetch(
-        import.meta.env.VITE_API_URL + "/analyze",
+        import.meta.env.VITE_API_URL + "/api/chat/send",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ text: input }),
+          body: JSON.stringify({ message: input }),
         }
       );
 
       const data = await res.json();
 
-      const detectedEmotion = data.emotion;
-      const aiMsg = { role: "ai", text: data.reply };
+      const detectedEmotion = data.emotion || "neutral";
+      const aiMsg = {
+        role: "ai",
+        text: data.reply || "I'm here for you ❤️",
+      };
 
       /* SAVE MOOD */
       const newEntry = {
@@ -209,9 +212,10 @@ export default function Chat() {
       );
 
       setEmotion(detectedEmotion);
-      speak(data.reply);
+      speak(aiMsg.text);
 
-    } catch {
+    } catch (err) {
+      console.error(err);
       alert("Backend error");
     }
 
