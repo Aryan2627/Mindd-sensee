@@ -1,5 +1,4 @@
 import React from "react";
-
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 
@@ -12,32 +11,30 @@ import Chat from "./pages/Chat";
 import MoodDashboard from "./pages/MoodDashboard";
 import Profile from "./pages/Profile";
 
+// 🔒 Protected route
 function PrivateRoute({ children }) {
   const { user } = useAuth();
-  return user ? children : <Navigate to="/auth" replace />;
+  if (!user) return <Navigate to="/auth" replace />;
+  return children;
 }
 
 export default function App() {
-  const { user } = useAuth();
-
   return (
     <div className="flex flex-col min-h-screen bg-black text-white">
       
-      {/* NAVBAR */}
       <Navbar />
 
-      {/* MAIN */}
       <div className="flex-grow">
         <Routes>
 
-          {/* PUBLIC ROUTES */}
+          {/* PUBLIC */}
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
 
-          {/* ✅ CHAT NOW PUBLIC (NO LOGIN REQUIRED) */}
+          {/* ✅ CHAT ALWAYS WORKS */}
           <Route path="/chat" element={<Chat />} />
 
-          {/* 🔒 PROTECTED ROUTES */}
+          {/* 🔒 PROTECTED */}
           <Route
             path="/mood"
             element={
@@ -62,9 +59,7 @@ export default function App() {
         </Routes>
       </div>
 
-      {/* FOOTER */}
       <Footer />
-
     </div>
   );
 }

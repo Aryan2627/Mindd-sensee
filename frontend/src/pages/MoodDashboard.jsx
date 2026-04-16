@@ -1,9 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Chart, registerables } from "chart.js";
 import { motion } from "framer-motion";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import React from "react";
+
 Chart.register(...registerables);
 
 /* 🎨 COLORS */
@@ -33,7 +33,7 @@ export default function MoodDashboard() {
   const lineChart = useRef(null);
   const donutChart = useRef(null);
 
-  /* ✅ LOAD + REALTIME */
+  /* ✅ LOAD DATA */
   useEffect(() => {
     const loadData = () => {
       const stored =
@@ -62,7 +62,7 @@ export default function MoodDashboard() {
             100
         );
 
-  /* 📊 CHART FIXED */
+  /* 📊 CHARTS */
   useEffect(() => {
     if (!history.length || !lineRef.current || !donutRef.current)
       return;
@@ -75,7 +75,6 @@ export default function MoodDashboard() {
       count[h.value] = (count[h.value] || 0) + 1;
     });
 
-    /* DESTROY OLD */
     if (lineChart.current) lineChart.current.destroy();
     if (donutChart.current) donutChart.current.destroy();
 
@@ -114,8 +113,6 @@ export default function MoodDashboard() {
       options: { maintainAspectRatio: false },
     });
 
-    const last = history[history.length - 1]?.value;
-
     setRecommendations([
       "🧘 Take a break",
       "📔 Journal your thoughts",
@@ -123,11 +120,11 @@ export default function MoodDashboard() {
     ]);
   }, [history]);
 
-  /* 🤖 AI INSIGHT */
+  /* 🤖 AI INSIGHT (FIXED ✅) */
   useEffect(() => {
     if (!history.length) return;
 
-    fetch("http://127.0.0.1:8000/api/insights", {
+    fetch(import.meta.env.VITE_API_URL + "/api/insights", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -135,7 +132,7 @@ export default function MoodDashboard() {
       body: JSON.stringify({ history }),
     })
       .then((r) => r.json())
-      .then((d) => setAiInsight(d.insight))
+      .then((d) => setAiInsight(d.insight || "No insight available"))
       .catch(() => setAiInsight("Insight unavailable"));
   }, [history]);
 
@@ -156,9 +153,6 @@ export default function MoodDashboard() {
       id="report"
       className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-white p-6"
     >
-      {/* 🌟 GLOW */}
-      <div className="absolute w-[400px] h-[400px] bg-purple-300/30 blur-3xl rounded-full top-[-100px]" />
-
       {/* HEADER */}
       <div className="flex justify-between mb-6">
         <h1 className="text-4xl text-purple-600">
