@@ -1,6 +1,6 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import React from "react";
 
 const features = [
   { icon: "🧠", title: "Emotion detection", desc: "AI reads emotion behind your words with high accuracy." },
@@ -15,7 +15,7 @@ export default function Landing() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-white overflow-hidden">
 
-      {/* 🌟 BACKGROUND GLOW */}
+      {/* BACKGROUND */}
       <div className="absolute w-[500px] h-[500px] bg-purple-300/30 rounded-full blur-3xl top-[-100px] left-[-100px]" />
       <div className="absolute w-[400px] h-[400px] bg-pink-300/30 rounded-full blur-3xl bottom-[-100px] right-[-100px]" />
 
@@ -33,43 +33,39 @@ export default function Landing() {
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
           className="text-5xl md:text-6xl font-bold leading-tight mb-6"
         >
-          A space to{" "}
-          <span className="text-purple-600">breathe</span>, reflect, and feel heard
+          A space to <span className="text-purple-600">breathe</span>, reflect, and feel heard
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
           className="text-lg text-gray-600 mb-10 max-w-xl mx-auto"
         >
           Mind-Sense listens, detects emotions with AI, and gently guides you
           toward better mental wellness — anytime.
         </motion.p>
 
-        {/* BUTTONS */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="flex gap-4 justify-center flex-wrap"
-        >
+        {/* ✅ BUTTONS FIXED */}
+        <motion.div className="flex gap-4 justify-center flex-wrap">
+
+          {/* 👉 MAIN CTA → CHAT */}
           <Link
-            to="/auth"
+            to="/chat"
             className="px-8 py-3.5 rounded-xl text-white font-medium bg-purple-600 hover:bg-purple-700 transition-all hover:scale-105 shadow-lg"
           >
             Start your journey
           </Link>
 
+          {/* 👉 DEMO */}
           <Link
             to="/chat"
             className="px-8 py-3.5 rounded-xl font-medium border border-purple-500 text-purple-600 hover:bg-purple-100 transition-all hover:scale-105"
           >
             Try Demo
           </Link>
+
         </motion.div>
       </section>
 
@@ -86,9 +82,6 @@ export default function Landing() {
         {features.map((f, i) => (
           <motion.div
             key={f.title}
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
             className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-gray-200 shadow-lg hover:shadow-purple-200 hover:-translate-y-2 transition-all"
           >
             <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-4 bg-purple-100">
@@ -97,7 +90,7 @@ export default function Landing() {
 
             <h3 className="font-semibold text-lg mb-2">{f.title}</h3>
 
-            <p className="text-sm text-gray-600 leading-relaxed">
+            <p className="text-sm text-gray-600">
               {f.desc}
             </p>
           </motion.div>
@@ -110,8 +103,9 @@ export default function Landing() {
           Start improving your mental wellness today
         </h2>
 
+        {/* 👉 ALSO FIXED */}
         <Link
-          to="/auth"
+          to="/chat"
           className="px-8 py-3 rounded-xl bg-purple-600 text-white hover:bg-purple-700 transition"
         >
           Get Started
